@@ -1,5 +1,12 @@
 ﻿#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+/*
+ *  Tip:
+ *  (Vert)
+ *  WorldNormal : = TransformObjectToWorldNormal(input.normalOS)
+ *  WorldPosition :  TransformObjectToWorld(input.positionOS.xyz)
+ * 
+ */
 
 //Get Gradient
 float4 Gradient(float4 Color1, float4 Color2 , float offset,float2 uv)
