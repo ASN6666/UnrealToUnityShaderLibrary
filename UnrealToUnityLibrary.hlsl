@@ -19,15 +19,18 @@ float4 Gradient(float4 Color1, float4 Color2 , float offset,float2 uv)
 float4 BaseCelShader(float4 MainLight,float3 VertexNormal,float4 ColorA,float4 ColorB,float Range , float ShadowPower)
 {
     float4 col;
-    col = saturate(step(Range,dot(MainLight,VertexNormal))+ ShadowPower);
+    col = step(Range,saturate(dot(MainLight,VertexNormal)))*ColorA + ColorB + ShadowPower;
     return col;
 }
 
-//AdditionalLightFucntion(Test)
-float3 AllAdditionalLightPass(float3 WorldPosition,float3 WorldNormal,float2 CutoffThreshold)
+
+//AdditionalLightFucntion
+float3 AllAdditionalLightPass(float3 WorldPosition,float3 WorldNormal,float2 CutoffThreshold,out float3 LightColor)
 {
+    LightColor = 0.0f;
+
     float3 COLOR;
-    int lightcount  =GetAdditionalLightsCount();
+    int lightcount  = GetAdditionalLightsCount();
     for (int i = 0; i < lightcount; i++)
     {
         Light light = GetAdditionalLight(i,WorldPosition);
@@ -35,9 +38,10 @@ float3 AllAdditionalLightPass(float3 WorldPosition,float3 WorldNormal,float2 Cut
         COLOR = smoothstep(CutoffThreshold.x,CutoffThreshold.y,COLOR);
         COLOR *= light.color;
         COLOR *= light.distanceAttenuation;
-        
+        LightColor += COLOR;
     }
     return COLOR;
+
 }
 
 float4 GetFresnel(float3 WorldPositon,float3 VertexNormal,float Edge)
@@ -48,3 +52,4 @@ float4 GetFresnel(float3 WorldPositon,float3 VertexNormal,float Edge)
     float4 fresnel = 1-saturate((dot(VertexNormal,viewDir))*Edge);
     return fresnel;
 }
+
