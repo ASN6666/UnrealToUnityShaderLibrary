@@ -19,7 +19,7 @@ float4 Gradient(float4 Color1, float4 Color2 , float offset,float2 uv)
 float4 BaseCelShader(float4 MainLight,float3 VertexNormal,float4 ColorA,float4 ColorB,float Range , float ShadowPower)
 {
     float4 col;
-    col = step(Range,saturate(dot(MainLight,VertexNormal)))*ColorA + ColorB + ShadowPower;
+    col = (step(Range,saturate(dot(MainLight,VertexNormal)))*ColorA + ColorB + ShadowPower);
     return col;
 }
 
@@ -58,3 +58,8 @@ float4 GetFresnel(float3 WorldPositon,float3 VertexNormal,float _min ,float _max
     return fresnel * float4(Color,1);
 }
 
+void GetOutline(float3 position,float3 normal,float outline,out float3 Result)
+{
+    //vert
+    Result = position.xyz + normal * outline;
+}
