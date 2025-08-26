@@ -25,7 +25,7 @@ float4 BaseCelShader(float4 MainLight,float3 VertexNormal,float4 ColorA,float4 C
 
 
 //AdditionalLightFucntion
-float3 AllAdditionalLightPass(float3 WorldPosition,float3 WorldNormal,float2 CutoffThreshold,out float3 LightColor)
+void AllAdditionalLightPass(float3 WorldPosition,float3 WorldNormal,float2 CutoffThreshold,out float3 LightColor)
 {
     LightColor = 0.0f;
 
@@ -40,16 +40,21 @@ float3 AllAdditionalLightPass(float3 WorldPosition,float3 WorldNormal,float2 Cut
         COLOR *= light.distanceAttenuation;
         LightColor += COLOR;
     }
-    return COLOR;
 
 }
 
-float4 GetFresnel(float3 WorldPositon,float3 VertexNormal,float Edge)
+float4 GetFresnel(float3 WorldPositon,float3 VertexNormal,float _min ,float _max,float3 Color)
 {
+    // float3 worldCameraPos = _WorldSpaceCameraPos;
+    // float3 viewDir = normalize(worldCameraPos - WorldPositon);
+    //             
+    // float4 fresnel = 1-saturate((dot(VertexNormal,viewDir))*Edge);
+    // return fresnel;
+
     float3 worldCameraPos = _WorldSpaceCameraPos;
     float3 viewDir = normalize(worldCameraPos - WorldPositon);
                 
-    float4 fresnel = 1-saturate((dot(VertexNormal,viewDir))*Edge);
-    return fresnel;
+    float4 fresnel = 1-saturate(smoothstep(_min,_max,(dot(VertexNormal,viewDir))));
+    return fresnel * float4(Color,1);
 }
 
