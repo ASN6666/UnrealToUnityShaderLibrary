@@ -18,7 +18,7 @@ float4 Gradient(float4 Color1, float4 Color2 , float offset,float2 uv)
 //Get Base CelShader
 float4 BaseCelShader(float4 MainLight,float3 VertexNormal,float4 ColorA,float4 ColorB,float Range , float ShadowPower,out float4 col)
 {
-    col = (step(Range,saturate(dot(MainLight,VertexNormal)))*ColorA + ColorB + ShadowPower);
+    col = (step(Range,saturate(dot(MainLight,VertexNormal)*0.5+0.5))*ColorA + ColorB + ShadowPower);
     return col;
 }
 
