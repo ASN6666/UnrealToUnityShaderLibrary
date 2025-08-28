@@ -78,15 +78,17 @@ void SetSDF(sampler2D _SDFTex,float2 uv,out float4 result)
     float3 LpU = dot(_MainLightPosition, upVector)/pow(length(upVector), 2) * upVector;
     float3 LpHeadHorizon = _MainLightPosition - LpU;
     float value = acos(dot(normalize(LpHeadHorizon), normalize(_SideVec)))/3.142;
-    float exposeRight = step(value, 0.5);
+    float exposeRight = step(value, 0.5);//計算光照閾值
+    
     float valueR = pow(1 - value * 2, 3);
     float valueL = pow(value * 2 - 1, 3);
     float mixValue = lerp(valueL, valueR, exposeRight);
     float sdfRembrandtLeft = tex2D(_SDFTex, float2(1 - uv.x, uv.y)).r;
     float sdfRembrandtRight = tex2D(_SDFTex, uv).r;
-    float mixSdf = lerp(sdfRembrandtRight, sdfRembrandtRight, .5);
+    float mixSdf = lerp(sdfRembrandtRight, sdfRembrandtLeft, exposeRight);
                     
     float sdf = step(mixValue, mixSdf);
-    sdf = lerp(0, sdf, step(0, dot(normalize(LpHeadHorizon), normalize(_forwardVec))));
+    sdf *= 2.5;//顏色校正
+    sdf = lerp(0, sdf  , step(0, dot(normalize(LpHeadHorizon), normalize(_forwardVec))));
     result = sdf;
 }
