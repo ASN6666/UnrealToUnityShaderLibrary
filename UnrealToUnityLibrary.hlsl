@@ -45,7 +45,10 @@ void AllAdditionalLightPass(float3 WorldPosition,float3 WorldNormal,float2 Cutof
 
 float4 GetFresnel(float3 WorldPositon,float3 VertexNormal,float _min ,float _max,float3 FrontColor,float3 BackColor)
 {
-    float halfLamber_NoL = 0.5 * dot(VertexNormal, _MainLightPosition) + 0.5;
+    
+    float2 L_View = normalize(mul((float3x3)UNITY_MATRIX_V, _MainLightPosition).xy);
+    float2 N_View = normalize(mul((float3x3)UNITY_MATRIX_V, lerp(VertexNormal, VertexNormal, .5)).xy);
+    float halfLamber_NoL = 0.5 * dot(WorldPositon, VertexNormal) + 0.5;
     float NhalfLamber_NoL = 0.5 * -dot(VertexNormal, _MainLightPosition) + 0.5;
     float3 worldCameraPos = _WorldSpaceCameraPos;
     float3 viewDir = normalize(worldCameraPos - WorldPositon);
@@ -92,3 +95,19 @@ void SetSDF(sampler2D _SDFTex,float2 uv,out float4 result)
     sdf = lerp(0, sdf  , step(0, dot(normalize(LpHeadHorizon), normalize(_forwardVec))));
     result = sdf;
 }
+
+float4 TransformHClipToViewPortPos(float4 positionCS)
+{
+    float4 o = positionCS * 0.5f;
+    o.xy = float2(o.x, o.y * _ProjectionParams.x) + o.w;
+    o.zw = positionCS.zw;
+    return o / o.w;
+}
+
+sampler sampler_depth;
+float GetDepth01(Texture2D depthTex, float2 uv)
+{
+    float depth = SAMPLE_TEXTURE2D(depthTex, sampler_depth, uv).r;//深度采样
+    return Linear01Depth(depth, _ZBufferParams);//限制深度转换为线性
+}
+
