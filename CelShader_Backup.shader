@@ -26,7 +26,7 @@ Shader "Unlit/CelShader"
         
         [Header(Color)]
         _ColorA("ColorA",Color) = (0,0,0,0)
-        _ColorB("ColorB",Color) = (0,0,0,0)
+        _ColorB("ShadowColor",Color) = (0,0,0,0)
         _Outline("Outline",Float) =.05
         
         [Header(Fresnel)]
@@ -329,7 +329,20 @@ Shader "Unlit/CelShader"
             }
             Pass
             {
-                Tags {"LightMode" = "ShadowCaster"}
+               Name "ShadowCaster"
+               Tags{"LightMode" = "ShadowCaster"}
+
+                ZWrite On
+                ZTest LEqual
+                ColorMask 0
+
+                HLSLPROGRAM
+                #pragma vertex ShadowPassVertex
+                #pragma fragment ShadowPassFragment
+
+                #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
+                #include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
+                ENDHLSL
             }
             Pass
             {
